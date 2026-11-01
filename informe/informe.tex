@@ -119,14 +119,42 @@ que es el valor de $1234 \cdot 5678$.
 
 \begin{figure}[h!]
   \centering
-  \hoja{img/Resolucion_recurrencia.png}{0.9}
+  \hoja{img/Resolucion_recurrencia.png}{0.65}
   \caption{Resolución de la recurrencia: Teorema Maestro \& Árbol de recurrencia.}
 \end{figure}
 
 \section{Análisis experimental}
 
 \subsection{Montaje}
-\pendiente{Describir: máquina y sistema operativo usados, compilador y banderas (por ejemplo \texttt{g++ -O2 -std=c++17}), reloj (\texttt{std::chrono::steady\_clock}), tamaños medidos (2 a 4096 dígitos, potencias de 2), número de repeticiones por tamaño y cómo se evita que el compilador elimine el cálculo.}
+Las mediciones se hicieron en un MacBook Air con procesador Apple M1 y macOS,
+compilando con Apple clang 21.0.0 (\texttt{c++ -std=c++17 -O2 -Wall -Wextra}) y
+sin \texttt{-flto}, de modo que el compilador no puede ver a través de las
+llamadas a los algoritmos ni eliminar el cálculo. El reloj es
+\texttt{std::chrono::steady\_clock}.
+
+Se midieron tamaños $n = 2, 4, 8, \dots, 4096$ dígitos. Para cada $n$ se
+generan dos operandos aleatorios de exactamente $n$ dígitos, con semilla fija,
+y ambos algoritmos reciben los mismos números. Antes de medir, se comprueba
+(fuera de la zona cronometrada) que los dos algoritmos dan el mismo producto.
+Para cada algoritmo y tamaño se hace una ejecución de calentamiento y luego se
+calibra el número de repeticiones hasta que un lote dure al menos 100~ms, muy
+por encima de la resolución del reloj. Se miden 7 lotes y se reporta la mediana
+del tiempo por multiplicación. Cada resultado se consume (se acumulan su
+longitud y su último dígito, que se imprime al final) para evitar que el
+cálculo se elimine.
+
+Karatsuba se midió con distintos umbrales del caso base: con \texttt{UMBRAL}
+$=u$, los operandos de a lo sumo $u$ dígitos se multiplican con el método
+clásico. Con $u=1$ la recursión llega hasta un dígito (Karatsuba ``puro''); con
+$u > 1$ se obtiene una versión híbrida. Se usaron $u \in \{1, 16, 64, 128\}$ en
+dos corridas completas y $u \in \{256, 512\}$ en una tercera.
+
+Una limitación: la medición no se hizo sobre un sistema dedicado, sino sobre
+macOS, que mantiene procesos en segundo plano y no permite fijar el proceso a
+un núcleo. Entre las dos corridas completas las diferencias son de alrededor de
+1\% o menos en los tamaños grandes, y llegan a cerca de 8\% en algunos tamaños
+pequeños; por eso los casos en que la ventaja es muy pequeña se reportan como
+empates.
 
 \subsection{Resultados}
 La Tabla~\ref{tab:tiempos} muestra el tiempo medio por multiplicación y la
@@ -144,24 +172,93 @@ Figura~\ref{fig:tiempo} lo grafica en escala log-log.
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.85\textwidth]{../docs/macos_tiempo.png}
+  \includegraphics[width=0.65\textwidth]{../docs/macos_tiempo.png}
   \caption{Tiempo frente al tamaño, en escala log-log. Las rectas punteadas
     son las pendientes de $n^2$ y de $n^{\log_2 3}$.}
   \label{fig:tiempo}
 \end{figure}
 
 \subsection{Punto de cruce}
-\pendiente{Reportar el tamaño a partir del cual Karatsuba supera al método clásico, o explicar por qué no aparece en el rango medido.}
+Definimos la razón $r(n) = T_{\text{clásica}}(n) / T_{\text{Karatsuba}}(n)$: si
+$r > 1$, Karatsuba es más rápido. El punto de cruce es el menor $n > u$ desde
+el cual $r > 1$ para todos los tamaños mayores. Se excluyen los $n \le u$
+porque ahí Karatsuba ejecuta el mismo caso base cuadrático que la clásica, y
+cualquier diferencia viene del código y no del algoritmo. El resultado depende
+del umbral (Tabla~\ref{tab:cruce} y Figura~\ref{fig:razon}).
+
+\begin{table}[h!]
+  \centering\small
+  \begin{tabular}{rcl}
+    \toprule
+    \texttt{UMBRAL} & $r(4096)$ & Punto de cruce                     \\
+    \midrule
+    1 (puro)        & 0.018     & no aparece en el rango medido      \\
+    16              & 0.375     & no aparece en el rango medido      \\
+    64              & 1.085     & $n = 4096$ (ventaja de 8\%)        \\
+    128             & 1.59      & entre 1024 y 2048 (empate en 1024) \\
+    256             & 1.90      & entre 512 y 1024 (empate en 512)   \\
+    512             & 1.96      & $n = 1024$                         \\
+    \bottomrule
+  \end{tabular}
+  \caption{Razón $r$ a 4096 dígitos y punto de cruce según el umbral.}
+  \label{tab:cruce}
+\end{table}
+
+Con $u=1$ y $u=16$ no hay cruce dentro de 2 a 4096 dígitos, pero $r$ crece unas
+1.3 veces por cada duplicación de $n$, que es lo esperado: $n^2 / n^{\log_2 3}
+  = n^{0.415}$ y $2^{0.415} \approx 1.33$. Extrapolando, el cruce estaría en el
+orden de decenas de miles de dígitos para $u=16$ y de decenas de millones para
+$u=1$ (es una extrapolación, no una medición). Con umbrales de 128 o más el
+cruce sí aparece dentro del rango. En $u=128$ y $u=256$ la ventaja en el primer
+tamaño es de menos de 2\%, así que se trata de empates y no de cruces firmes.
+Los mejores resultados se obtienen con $u$ entre 256 y 512, donde Karatsuba es
+unas 1.9 veces más rápido a 4096 dígitos.
+
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.85\textwidth]{../docs/macos_razon.png}
+  \includegraphics[width=0.65\textwidth]{../docs/macos_razon.png}
   \caption{Razón entre el tiempo de la clásica y el de Karatsuba. Donde la
     curva supera la línea roja, Karatsuba es más rápido.}
   \label{fig:razon}
 \end{figure}
 
 \subsection{Complejidad asintótica frente a rendimiento real}
-\pendiente{Explicar por qué para números pequeños el método clásico puede ser más rápido: constantes ocultas, copias de cadenas, asignaciones de memoria y sobrecarga de la recursión.}
+Los datos confirman la cota asintótica. Al duplicar $n$, el tiempo de la
+clásica se multiplica por $\approx 4$ y el de Karatsuba puro por $\approx 3$;
+los exponentes ajustados por mínimos cuadrados sobre $n \ge 128$ son $1.94$
+para la clásica y $1.61$ para Karatsuba puro, frente a $2$ y $\log_2 3 \approx
+  1.585$ (Figura~\ref{fig:tiempo}). Sin embargo, la cota asintótica describe cómo
+crece el tiempo, no cuál es más rápido para un tamaño concreto: las constantes
+ocultas deciden el rango en que cada método gana.
+
+\textbf{Constantes ocultas.} La clásica es un doble ciclo sobre enteros con
+acceso contiguo a memoria; a 4096 dígitos cuesta unos
+$5367\,\mu\text{s}/4096^2 \approx 0.32$~ns por producto de dígitos. En cambio, el
+trabajo lineal de cada llamada recursiva de Karatsuba (partir, rellenar, sumar,
+restar y desplazar cadenas) crea y copia una veintena de cadenas de tamaño
+cercano a $n$. Esas copias y asignaciones de memoria son $\Theta(n)$ y no
+cambian el orden asintótico, pero su constante es mucho mayor que la del ciclo
+clásico. Karatsuba puro a 4096 dígitos tarda unos 298\,000~$\mu$s, unas 55
+veces el tiempo de la clásica.
+
+\textbf{Un modelo simple.} Un nivel de recursión ahorra unos $\tfrac14 c_0 n^2$
+(la clásica hace 4 subproductos de tamaño $n/2$ y Karatsuba 3) y añade unos
+$c_1 n$ de trabajo lineal. Compensa cuando $n \gtrsim 4c_1/c_0$. Con
+$c_0 \approx 0.32$~ns y un cruce observado entre 512 y 1024, resulta $c_1$ del
+orden de decenas de nanosegundos por dígito, más de cien veces $c_0$. Es una
+estimación de orden de magnitud, no una medición directa.
+
+\textbf{El salto en $n = 2u$.} Con $u=16$, la razón es $\approx 0.9$ en $n=16$
+(mismo caso base) y cae a $0.19$ en $n=32$: un solo nivel de recursión cuesta
+unas cinco veces lo que cuesta la multiplicación clásica completa a ese tamaño.
+Una posible causa adicional (hipótesis, no comprobada) es que las sumas
+$x_1+x_0$ pueden tener $m+1$ dígitos, superar el umbral y provocar un nivel
+extra de recursión.
+
+Por eso el umbral importa: delegar los tamaños pequeños en el ciclo clásico
+evita pagar la sobrecarga de la recursión donde no compensa. Esto explica por
+qué para números pequeños el método clásico puede ser más rápido aunque su
+complejidad asintótica sea peor.
 
 \section{Conclusiones y dificultades encontradas}
 
