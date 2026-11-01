@@ -1,7 +1,11 @@
+.DS_Store
+build/
+*.o
+test_validacion
+test_aritmetica
+medicion_u*
+.vscode/
 informe/*.aux
 informe/*.log
 informe/*.out
 informe/*.toc
-test_validacion
-medicion_u*
-*.csv.tmp
