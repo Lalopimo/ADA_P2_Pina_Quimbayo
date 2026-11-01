@@ -29,16 +29,16 @@
 
 Sean $x$ e $y$ dos enteros de $n$ dígitos en base $B$, y sea $m = n/2$. Partimos cada número en su mitad alta y su mitad baja:
 \[
-x = x_1 B^m + x_0, \qquad y = y_1 B^m + y_0,
+  x = x_1 B^m + x_0, \qquad y = y_1 B^m + y_0,
 \]
 donde $0 \le x_0, y_0 < B^m$. Multiplicando y distribuyendo:
 \begin{align}
-x \cdot y &= (x_1 B^m + x_0)(y_1 B^m + y_0) \notag\\
-          &= x_1 y_1 B^{2m} + (x_1 y_0 + x_0 y_1) B^m + x_0 y_0. \label{eq:cuatro}
+  x \cdot y & = (x_1 B^m + x_0)(y_1 B^m + y_0) \notag                                 \\
+            & = x_1 y_1 B^{2m} + (x_1 y_0 + x_0 y_1) B^m + x_0 y_0. \label{eq:cuatro}
 \end{align}
 Esta expresión requiere \emph{cuatro} productos de números de $m = n/2$ dígitos: $x_1y_1$, $x_1y_0$, $x_0y_1$ y $x_0y_0$. El resto del trabajo (sumas y desplazamientos por potencias de $B$) es lineal en $n$. Por tanto
 \[
-T(n) = 4\,T(n/2) + \Theta(n),
+  T(n) = 4\,T(n/2) + \Theta(n),
 \]
 que no mejora el orden cuadrático del método del colegio.
 
@@ -46,26 +46,26 @@ que no mejora el orden cuadrático del método del colegio.
 
 De los cuatro productos de \eqref{eq:cuatro}, los extremos $x_1y_1$ y $x_0y_0$ son necesarios. Pero del producto central solo nos interesa la \emph{suma} $x_1y_0 + x_0y_1$, no cada sumando por separado. La idea es obtener esa suma con un único producto adicional. Definimos
 \[
-P_1 = x_1 y_1, \qquad P_2 = x_0 y_0, \qquad P_3 = (x_1 + x_0)(y_1 + y_0).
+  P_1 = x_1 y_1, \qquad P_2 = x_0 y_0, \qquad P_3 = (x_1 + x_0)(y_1 + y_0).
 \]
 Desarrollando $P_3$:
 \[
-P_3 = x_1 y_1 + x_1 y_0 + x_0 y_1 + x_0 y_0 = P_1 + (x_1 y_0 + x_0 y_1) + P_2 .
+  P_3 = x_1 y_1 + x_1 y_0 + x_0 y_1 + x_0 y_0 = P_1 + (x_1 y_0 + x_0 y_1) + P_2 .
 \]
 Despejando el término central:
 \begin{equation}
-x_1 y_0 + x_0 y_1 = P_3 - P_1 - P_2. \label{eq:central}
+  x_1 y_0 + x_0 y_1 = P_3 - P_1 - P_2. \label{eq:central}
 \end{equation}
 Sustituyendo \eqref{eq:central} en \eqref{eq:cuatro} obtenemos la identidad de Karatsuba:
 \begin{equation}
-\boxed{\,x \cdot y = P_1 B^{2m} + (P_3 - P_1 - P_2) B^m + P_2\,} \label{eq:karatsuba}
+  \boxed{\,x \cdot y = P_1 B^{2m} + (P_3 - P_1 - P_2) B^m + P_2\,} \label{eq:karatsuba}
 \end{equation}
 
 \subsection{Por qué tres productos y no cuatro}
 
 El producto $P_3$ ``contiene'' a la vez los dos productos cruzados que antes calculábamos por separado, junto con $P_1$ y $P_2$, que ya teníamos. Como $P_1$ y $P_2$ se necesitan de todos modos, restarlos de $P_3$ deja exactamente $x_1y_0 + x_0y_1$. Hemos cambiado un producto recursivo de $m$ dígitos por dos sumas y tres restas de números de a lo sumo $n$ dígitos, que cuestan $\Theta(n)$ y no aumentan el orden del término no recursivo. Así la recurrencia pasa de $4T(n/2)+\Theta(n)$ a
 \[
-T(n) = 3\,T(n/2) + \Theta(n).
+  T(n) = 3\,T(n/2) + \Theta(n).
 \]
 
 \subsection{Detalles que importan en la implementación}
@@ -73,22 +73,22 @@ T(n) = 3\,T(n/2) + \Theta(n).
 \begin{itemize}
   \item \textbf{Dígito adicional.} Las sumas $x_1 + x_0$ e $y_1 + y_0$ pueden tener $m+1$ dígitos. Eso no cambia el orden lineal del término no recursivo, pero obliga a que las funciones auxiliares admitan operandos y resultados de longitud variable.
   \item \textbf{Orden de las restas.} El término central es no negativo, pero para evitar un negativo intermedio con dígitos sin signo se calcula primero $P_3 - P_1$ y luego se resta $P_2$. Ambas restas son no negativas, porque
-  \[
-  P_3 - P_1 = P_2 + x_1 y_0 + x_0 y_1 \ge P_2 .
-  \]
+        \[
+          P_3 - P_1 = P_2 + x_1 y_0 + x_0 y_1 \ge P_2 .
+        \]
 \end{itemize}
 
 \subsection{Ejemplo numérico}
 
 Sea $x = 1234$, $y = 5678$, $B = 10$, $m = 2$. Entonces $x_1 = 12$, $x_0 = 34$, $y_1 = 56$, $y_0 = 78$ y
 \begin{align*}
-P_1 &= 12 \cdot 56 = 672, \\
-P_2 &= 34 \cdot 78 = 2652, \\
-P_3 &= (12+34)(56+78) = 46 \cdot 134 = 6164.
+  P_1 & = 12 \cdot 56 = 672,                    \\
+  P_2 & = 34 \cdot 78 = 2652,                   \\
+  P_3 & = (12+34)(56+78) = 46 \cdot 134 = 6164.
 \end{align*}
 El término central es $P_3 - P_1 - P_2 = 6164 - 672 - 2652 = 2840$, que coincide con $x_1y_0 + x_0y_1 = 12\cdot 78 + 34 \cdot 56 = 936 + 1904 = 2840$. Por la identidad \eqref{eq:karatsuba}:
 \[
-x \cdot y = 672 \cdot 10^4 + 2840 \cdot 10^2 + 2652 = 7\,006\,652,
+  x \cdot y = 672 \cdot 10^4 + 2840 \cdot 10^2 + 2652 = 7\,006\,652,
 \]
 que es el valor de $1234 \cdot 5678$.
 
@@ -120,10 +120,10 @@ que es el valor de $1234 \cdot 5678$.
     \toprule
     $n$ (dígitos) & Clásica (\textmu s) & Karatsuba (\textmu s) & Razón \\
     \midrule
-    2    & -- & -- & -- \\
-    4    & -- & -- & -- \\
-    \multicolumn{4}{c}{\dots} \\
-    4096 & -- & -- & -- \\
+    2             & --                  & --                    & --    \\
+    4             & --                  & --                    & --    \\
+    \multicolumn{4}{c}{\dots}                                           \\
+    4096          & --                  & --                    & --    \\
     \bottomrule
   \end{tabular}
   \caption{Tiempos medios de ejecución por tamaño.}
