@@ -1,6 +1,7 @@
+#include "algoritmos.hpp"
+#include "aritmetica.hpp"
+
 #include <algorithm>
-#include <chrono>
-#include <iostream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -8,62 +9,12 @@
 using namespace std;
 
 #ifndef UMBRAL
-#define UMBRAL 1 //<---- apartir de este numero empieza a utilizar recursion
+#define UMBRAL 1 //<---- por debajo de este tamaño se multiplica directo, si no recursión
 #endif
 
-
-string normalizar(const string& A) {
-    size_t i = 0;
-    while (i + 1 < A.size() && A[i] == '0') i++;
-    return A.empty() ? "0" : A.substr(i);
-}
-
-
-string rellenar(const string& A, size_t n) {
-    if (A.size() >= n) return A;
-    return string(n - A.size(), '0') + A;
-}
-
-string sumar(const string& A, const string& B) {
-    string R;
-    R.reserve(max(A.size(), B.size()) + 1);
-    int i = (int)A.size() - 1, j = (int)B.size() - 1, acarreo = 0;
-    while (i >= 0 || j >= 0 || acarreo) {
-        int s = acarreo;
-        if (i >= 0) s += A[i--] - '0';
-        if (j >= 0) s += B[j--] - '0';
-        R.push_back(char('0' + s % 10));
-        acarreo = s / 10;
-    }
-    reverse(R.begin(), R.end());
-    return normalizar(R);
-}
-
-string restar(const string& A, const string& B) {
-    string R;
-    R.reserve(A.size());
-    int i = (int)A.size() - 1, j = (int)B.size() - 1, prestamo = 0;
-    while (i >= 0) {
-        int d = (A[i--] - '0') - prestamo;
-        if (j >= 0) d -= (B[j--] - '0');
-        if (d < 0) { d += 10; prestamo = 1; } else prestamo = 0;
-        R.push_back(char('0' + d));
-    }
-    reverse(R.begin(), R.end());
-    return normalizar(R);
-}
-
-string desplazar(const string& A, size_t k) {
-    if (A == "0") return "0";
-    return A + string(k, '0');
-}
-
-pair<string, string> partir(const string& A, size_t m) {
-    if (A.size() <= m) return {"0", normalizar(A)};
-    string alta = A.substr(0, A.size() - m);
-    string baja = A.substr(A.size() - m);
-    return {normalizar(alta), normalizar(baja)};
-}
+// Funciones internas de este archivo 
+// (el namespace anónimo evita que choquen con otros archivos y que se vean desde fuera).
+namespace {
 
 string multiplicadirecta(const string& X, const string& Y) {
     size_t n = X.size(), m = Y.size();
@@ -92,7 +43,6 @@ string karatsubaRec(string X, string Y) {
 
     if (X == "0" || Y == "0") return "0";
 
-
     if (X.size() <= UMBRAL && Y.size() <= UMBRAL)
         return multiplicadirecta(X, Y);
 
@@ -114,6 +64,8 @@ string karatsubaRec(string X, string Y) {
     return normalizar(R);
 }
 
+} // namespace
+
 string karatsuba(string X, string Y) {
     X = normalizar(X);
     Y = normalizar(Y);
@@ -122,31 +74,4 @@ string karatsuba(string X, string Y) {
     X = rellenar(X, n);
     Y = rellenar(Y, n);
     return karatsubaRec(X, Y);
-}
-
-bool esNumero(const string& s) {
-    return !s.empty() && all_of(s.begin(), s.end(),
-                                [](char c) { return c >= '0' && c <= '9'; });
-}
-
-int main() {
-    string a, b;
-    cout << "Primer cadena: ";
-    cin >> a;
-    cout << "Segunda cadena: ";
-    cin >> b;
-    if (!esNumero(a) || !esNumero(b)) {
-        cerr << "Solo se pueden numeros positivos.\n";
-        return 1;
-    }
-    auto inicio = chrono::steady_clock::now();
-    string producto = karatsuba(a, b);
-    auto fin = chrono::steady_clock::now();
-
-    chrono::duration<double, milli> ms = fin - inicio;
-    cout << "Resultado: " << producto << "\n";
-    cout << "Tiempo: " << ms.count() << " ms ("
-         << chrono::duration_cast<chrono::microseconds>(fin - inicio).count()
-         << " us)\n";
-    return 0;
 }

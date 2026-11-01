@@ -2,19 +2,7 @@
 //
 // Uso:   ./medicion [n_max=4096] [muestras=7]  > resultados.csv
 // Salida: CSV por la salida estándar; progreso y resumen por la de error.
-//
-// Protocolo (para el informe):
-//  * Tamaños n = 2, 4, 8, ..., n_max dígitos. Operandos aleatorios de exactamente n
-//    dígitos (semilla fija => los mismos números en cada corrida).
-//  * Reloj: std::chrono::steady_clock.
-//  * Para cada algoritmo y tamaño: un calentamiento, luego se calibra el número de
-//    repeticiones `reps` hasta que un lote dure >= 100 ms (muy por encima de la
-//    resolución del reloj), y se miden `muestras` lotes. Se reporta la mediana y el
-//    mínimo del tiempo por multiplicación.
-//  * Cada resultado se consume (tamaño + último dígito) y se imprime al final, para
-//    que el compilador no pueda eliminar el cálculo. La verificación de que ambos
-//    algoritmos coinciden se hace fuera de la zona cronometrada.
-//  * NO compilar con -flto (permitiría al compilador ver a través de las llamadas).
+
 #include "algoritmos.hpp"
 
 #include <algorithm>
