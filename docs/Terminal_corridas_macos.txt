@@ -1,0 +1,390 @@
+Last login: Sun Nov  1 12:58:36 on ttys001
+lalopina@MacBook-Air-de-Jose-3 ~ % cd /Users/lalopina/GitHub/ADA_P2/ADA_P2_Pina_Quimbayo 
+lalopina@MacBook-Air-de-Jose-3 ADA_P2_Pina_Quimbayo % make medir NMAX=256 Muestras=3          
+mkdir -p docs
+{ echo "fecha: $(date)"; echo "sistema: $(uname -a)"; echo "compilador: $(c++ --version | head -1)"; \
+	  echo "banderas: -std=c++17 -O2 -Wall -Wextra -Isrc"; \
+	  if command -v lscpu >/dev/null 2>&1; then lscpu | grep -E "Model name|^CPU\(s\)|max MHz|Thread|Core"; \
+	  else echo "cpu: $(sysctl -n machdep.cpu.brand_string 2>/dev/null)"; fi; } > docs/entorno_Darwin_arm64.txt
+cat docs/entorno_Darwin_arm64.txt
+fecha: Sun  1 Nov 2026 13:22:24 -05
+sistema: Darwin MacBook-Air-de-Jose-3.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:27 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T8103 arm64
+compilador: Apple clang version 21.0.0 (clang-2100.4.1.1)
+banderas: -std=c++17 -O2 -Wall -Wextra -Isrc
+cpu: Apple M1
+for u in 1 16 64 128; do \
+	  echo "== Midiendo UMBRAL=$u  (n_max=256, muestras=7)"; \
+	  ./build/medicion_u$u 256 7 > docs/resultados_Darwin_arm64_u$u.csv || exit 1; \
+	done
+== Midiendo UMBRAL=1  (n_max=256, muestras=7)
+n=2  clasica=0.0588486 us  karatsuba=0.557247 us  razon=0.105606
+n=4  clasica=0.0741181 us  karatsuba=3.1405 us  razon=0.0236007
+n=8  clasica=0.151237 us  karatsuba=10.9729 us  razon=0.0137827
+n=16  clasica=0.281883 us  karatsuba=37.4785 us  razon=0.00752119
+n=32  clasica=0.609805 us  karatsuba=118.593 us  razon=0.005142
+n=64  clasica=2.04654 us  karatsuba=369.009 us  razon=0.00554604
+n=128  clasica=6.61582 us  karatsuba=1166.71 us  razon=0.00567051
+n=256  clasica=23.8147 us  karatsuba=3335.47 us  razon=0.00713985
+No hay punto de cruce en el rango medido (UMBRAL=1)
+checksum (para evitar eliminacion del calculo): 3209452296
+== Midiendo UMBRAL=16  (n_max=256, muestras=7)
+n=2  clasica=0.0590827 us  karatsuba=0.0650688 us  razon=0.908003
+n=4  clasica=0.0743634 us  karatsuba=0.0830275 us  razon=0.895648
+n=8  clasica=0.153733 us  karatsuba=0.165428 us  razon=0.929306
+n=16  clasica=0.28585 us  karatsuba=0.322 us  razon=0.887733
+n=32  clasica=0.608889 us  karatsuba=3.20522 us  razon=0.189968
+n=64  clasica=2.05071 us  karatsuba=13.3992 us  razon=0.153047
+n=128  clasica=6.62665 us  karatsuba=47.8567 us  razon=0.138469
+n=256  clasica=23.8554 us  karatsuba=141.22 us  razon=0.168923
+No hay punto de cruce en el rango medido (UMBRAL=16)
+checksum (para evitar eliminacion del calculo): 5813525016
+== Midiendo UMBRAL=64  (n_max=256, muestras=7)
+n=2  clasica=0.059094 us  karatsuba=0.0652847 us  razon=0.905174
+n=4  clasica=0.0743796 us  karatsuba=0.0828881 us  razon=0.89735
+n=8  clasica=0.153612 us  karatsuba=0.165612 us  razon=0.927543
+n=16  clasica=0.284243 us  karatsuba=0.319207 us  razon=0.890466
+n=32  clasica=0.610278 us  karatsuba=0.706644 us  razon=0.863628
+n=64  clasica=2.11128 us  karatsuba=1.84646 us  razon=1.14342
+n=128  clasica=6.61725 us  karatsuba=11.38 us  razon=0.581483
+n=256  clasica=23.823 us  karatsuba=38.2632 us  razon=0.622608
+No hay punto de cruce en el rango medido (UMBRAL=64)
+checksum (para evitar eliminacion del calculo): 6139861016
+== Midiendo UMBRAL=128  (n_max=256, muestras=7)
+n=2  clasica=0.0589744 us  karatsuba=0.0653145 us  razon=0.902931
+n=4  clasica=0.0743756 us  karatsuba=0.0831533 us  razon=0.894439
+n=8  clasica=0.153761 us  karatsuba=0.166034 us  razon=0.926077
+n=16  clasica=0.286382 us  karatsuba=0.310436 us  razon=0.922514
+n=32  clasica=0.609171 us  karatsuba=0.705483 us  razon=0.863481
+n=64  clasica=2.10877 us  karatsuba=1.84705 us  razon=1.1417
+n=128  clasica=6.61514 us  karatsuba=6.68936 us  razon=0.988905
+n=256  clasica=23.8242 us  karatsuba=26.6515 us  razon=0.893916
+No hay punto de cruce en el rango medido (UMBRAL=128)
+checksum (para evitar eliminacion del calculo): 6148541016
+echo "Listo: CSV en docs/resultados_Darwin_arm64_u*.csv"
+Listo: CSV en docs/resultados_Darwin_arm64_u*.csv
+lalopina@MacBook-Air-de-Jose-3 ADA_P2_Pina_Quimbayo % caffeinate -i make medir                
+mkdir -p docs/macos_corrida1
+mv docs/resultados_*.csv docs/entorno_*.txt docs/macos_corrida1/
+mkdir -p docs
+{ echo "fecha: $(date)"; echo "sistema: $(uname -a)"; echo "compilador: $(c++ --version | head -1)"; \
+	  echo "banderas: -std=c++17 -O2 -Wall -Wextra -Isrc"; \
+	  if command -v lscpu >/dev/null 2>&1; then lscpu | grep -E "Model name|^CPU\(s\)|max MHz|Thread|Core"; \
+	  else echo "cpu: $(sysctl -n machdep.cpu.brand_string 2>/dev/null)"; fi; } > docs/entorno_Darwin_arm64.txt
+cat docs/entorno_Darwin_arm64.txt
+fecha: Sun  1 Nov 2026 13:24:11 -05
+sistema: Darwin MacBook-Air-de-Jose-3.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:27 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T8103 arm64
+compilador: Apple clang version 21.0.0 (clang-2100.4.1.1)
+banderas: -std=c++17 -O2 -Wall -Wextra -Isrc
+cpu: Apple M1
+for u in 1 16 64 128; do \
+	  echo "== Midiendo UMBRAL=$u  (n_max=4096, muestras=7)"; \
+	  ./build/medicion_u$u 4096 7 > docs/resultados_Darwin_arm64_u$u.csv || exit 1; \
+	done
+== Midiendo UMBRAL=1  (n_max=4096, muestras=7)
+n=2  clasica=0.0584173 us  karatsuba=0.561373 us  razon=0.104062
+n=4  clasica=0.0742283 us  karatsuba=3.13106 us  razon=0.0237071
+n=8  clasica=0.151599 us  karatsuba=10.9765 us  razon=0.0138112
+n=16  clasica=0.297673 us  karatsuba=37.291 us  razon=0.00798245
+n=32  clasica=0.609534 us  karatsuba=118.6 us  razon=0.00513939
+n=64  clasica=2.05988 us  karatsuba=368.228 us  razon=0.00559403
+n=128  clasica=6.6265 us  karatsuba=1169.43 us  razon=0.00566643
+n=256  clasica=23.82 us  karatsuba=3339.19 us  razon=0.00713345
+n=512  clasica=86.3579 us  karatsuba=10854 us  razon=0.00795633
+n=1024  clasica=337.105 us  karatsuba=32403.5 us  razon=0.0104034
+n=2048  clasica=1339.04 us  karatsuba=99842 us  razon=0.0134116
+n=4096  clasica=5366.81 us  karatsuba=297595 us  razon=0.0180339
+No hay punto de cruce en el rango medido (UMBRAL=1)
+checksum (para evitar eliminacion del calculo): 3239869437
+== Midiendo UMBRAL=16  (n_max=4096, muestras=7)
+n=2  clasica=0.0589147 us  karatsuba=0.0650381 us  razon=0.90585
+n=4  clasica=0.0743675 us  karatsuba=0.0827013 us  razon=0.89923
+n=8  clasica=0.153647 us  karatsuba=0.165559 us  razon=0.928049
+n=16  clasica=0.316793 us  karatsuba=0.329594 us  razon=0.96116
+n=32  clasica=0.607959 us  karatsuba=3.20587 us  razon=0.189639
+n=64  clasica=2.10211 us  karatsuba=13.4383 us  razon=0.156427
+n=128  clasica=6.61276 us  karatsuba=47.8539 us  razon=0.138186
+n=256  clasica=23.8374 us  karatsuba=140.976 us  razon=0.169089
+n=512  clasica=86.3455 us  karatsuba=498.954 us  razon=0.173053
+n=1024  clasica=337.017 us  karatsuba=1498.34 us  razon=0.224926
+n=2048  clasica=1338.98 us  karatsuba=4799.12 us  razon=0.279006
+n=4096  clasica=5366.73 us  karatsuba=14311.5 us  razon=0.374994
+No hay punto de cruce en el rango medido (UMBRAL=16)
+checksum (para evitar eliminacion del calculo): 5850918150
+== Midiendo UMBRAL=64  (n_max=4096, muestras=7)
+n=2  clasica=0.0588596 us  karatsuba=0.0649843 us  razon=0.90575
+n=4  clasica=0.0743574 us  karatsuba=0.0827253 us  razon=0.898848
+n=8  clasica=0.153616 us  karatsuba=0.165737 us  razon=0.926864
+n=16  clasica=0.293778 us  karatsuba=0.328776 us  razon=0.893551
+n=32  clasica=0.60902 us  karatsuba=0.705668 us  razon=0.863041
+n=64  clasica=2.04849 us  karatsuba=1.84679 us  razon=1.10921
+n=128  clasica=6.6147 us  karatsuba=11.3894 us  razon=0.580778
+n=256  clasica=23.8146 us  karatsuba=38.2338 us  razon=0.622868
+n=512  clasica=86.3406 us  karatsuba=158.635 us  razon=0.544272
+n=1024  clasica=337.6 us  karatsuba=487.181 us  razon=0.692965
+n=2048  clasica=1341.05 us  karatsuba=1646.74 us  razon=0.814365
+n=4096  clasica=5366.81 us  karatsuba=4945.32 us  razon=1.08523
+Punto de cruce (UMBRAL=64): n = 4096 digitos
+checksum (para evitar eliminacion del calculo): 6190806190
+== Midiendo UMBRAL=128  (n_max=4096, muestras=7)
+n=2  clasica=0.0589538 us  karatsuba=0.0665694 us  razon=0.885598
+n=4  clasica=0.0743167 us  karatsuba=0.0828464 us  razon=0.897041
+n=8  clasica=0.153529 us  karatsuba=0.165758 us  razon=0.926227
+n=16  clasica=0.290069 us  karatsuba=0.321534 us  razon=0.90214
+n=32  clasica=0.609395 us  karatsuba=0.705787 us  razon=0.863425
+n=64  clasica=2.03919 us  karatsuba=1.84899 us  razon=1.10286
+n=128  clasica=6.61432 us  karatsuba=6.69123 us  razon=0.988505
+n=256  clasica=23.8402 us  karatsuba=26.6383 us  razon=0.894961
+n=512  clasica=86.3645 us  karatsuba=104.558 us  razon=0.825992
+n=1024  clasica=337.102 us  karatsuba=330.987 us  razon=1.01848
+n=2048  clasica=1338.59 us  karatsuba=1107.11 us  razon=1.20909
+n=4096  clasica=5369.77 us  karatsuba=3372.28 us  razon=1.59232
+Punto de cruce (UMBRAL=128): n = 1024 digitos
+checksum (para evitar eliminacion del calculo): 6210194030
+echo "Listo: CSV en docs/resultados_Darwin_arm64_u*.csv"
+Listo: CSV en docs/resultados_Darwin_arm64_u*.csv
+lalopina@MacBook-Air-de-Jose-3 ADA_P2_Pina_Quimbayo % caffeinate -i make medir                              
+mkdir -p docs/macos_corrida2
+mv docs/resultados_*.csv docs/entorno_*.txt docs/macos_corrida2/
+mkdir -p docs
+{ echo "fecha: $(date)"; echo "sistema: $(uname -a)"; echo "compilador: $(c++ --version | head -1)"; \
+	  echo "banderas: -std=c++17 -O2 -Wall -Wextra -Isrc"; \
+	  if command -v lscpu >/dev/null 2>&1; then lscpu | grep -E "Model name|^CPU\(s\)|max MHz|Thread|Core"; \
+	  else echo "cpu: $(sysctl -n machdep.cpu.brand_string 2>/dev/null)"; fi; } > docs/entorno_Darwin_arm64.txt
+cat docs/entorno_Darwin_arm64.txt
+fecha: Sun  1 Nov 2026 13:27:07 -05
+sistema: Darwin MacBook-Air-de-Jose-3.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:27 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T8103 arm64
+compilador: Apple clang version 21.0.0 (clang-2100.4.1.1)
+banderas: -std=c++17 -O2 -Wall -Wextra -Isrc
+cpu: Apple M1
+for u in 1 16 64 128; do \
+	  echo "== Midiendo UMBRAL=$u  (n_max=4096, muestras=7)"; \
+	  ./build/medicion_u$u 4096 7 > docs/resultados_Darwin_arm64_u$u.csv || exit 1; \
+	done
+== Midiendo UMBRAL=1  (n_max=4096, muestras=7)
+n=2  clasica=0.0588368 us  karatsuba=0.543972 us  razon=0.108161
+n=4  clasica=0.0733943 us  karatsuba=3.13361 us  razon=0.0234217
+n=8  clasica=0.151103 us  karatsuba=10.9773 us  razon=0.013765
+n=16  clasica=0.295528 us  karatsuba=36.8818 us  razon=0.00801283
+n=32  clasica=0.608452 us  karatsuba=118.712 us  razon=0.00512546
+n=64  clasica=2.07914 us  karatsuba=368.275 us  razon=0.00564561
+n=128  clasica=6.61552 us  karatsuba=1170.48 us  razon=0.00565197
+n=256  clasica=23.814 us  karatsuba=3340.04 us  razon=0.00712985
+n=512  clasica=86.3495 us  karatsuba=10868.7 us  razon=0.00794481
+n=1024  clasica=337.055 us  karatsuba=32426 us  razon=0.0103946
+n=2048  clasica=1338.52 us  karatsuba=99930.8 us  razon=0.0133945
+n=4096  clasica=5366.55 us  karatsuba=297780 us  razon=0.0180218
+No hay punto de cruce en el rango medido (UMBRAL=1)
+checksum (para evitar eliminacion del calculo): 3239906805
+== Midiendo UMBRAL=16  (n_max=4096, muestras=7)
+n=2  clasica=0.05888 us  karatsuba=0.0647115 us  razon=0.909884
+n=4  clasica=0.0744657 us  karatsuba=0.0827947 us  razon=0.899402
+n=8  clasica=0.153678 us  karatsuba=0.165629 us  razon=0.927845
+n=16  clasica=0.297156 us  karatsuba=0.326771 us  razon=0.909369
+n=32  clasica=0.60838 us  karatsuba=3.20711 us  razon=0.189697
+n=64  clasica=2.04031 us  karatsuba=13.4361 us  razon=0.151853
+n=128  clasica=6.62441 us  karatsuba=47.8874 us  razon=0.138333
+n=256  clasica=23.8156 us  karatsuba=141.153 us  razon=0.168723
+n=512  clasica=86.3581 us  karatsuba=499.818 us  razon=0.172779
+n=1024  clasica=337.012 us  karatsuba=1498.34 us  razon=0.224924
+n=2048  clasica=1339.28 us  karatsuba=4797.02 us  razon=0.279191
+n=4096  clasica=5366.52 us  karatsuba=14320.4 us  razon=0.374747
+No hay punto de cruce en el rango medido (UMBRAL=16)
+checksum (para evitar eliminacion del calculo): 5848988550
+== Midiendo UMBRAL=64  (n_max=4096, muestras=7)
+n=2  clasica=0.0588486 us  karatsuba=0.0648195 us  razon=0.907884
+n=4  clasica=0.0743579 us  karatsuba=0.0827147 us  razon=0.898969
+n=8  clasica=0.153873 us  karatsuba=0.165909 us  razon=0.927453
+n=16  clasica=0.293728 us  karatsuba=0.326915 us  razon=0.898486
+n=32  clasica=0.610569 us  karatsuba=0.706965 us  razon=0.863649
+n=64  clasica=2.02222 us  karatsuba=1.85108 us  razon=1.09245
+n=128  clasica=6.62697 us  karatsuba=11.4114 us  razon=0.580734
+n=256  clasica=23.8174 us  karatsuba=38.2674 us  razon=0.622394
+n=512  clasica=86.3608 us  karatsuba=158.737 us  razon=0.544051
+n=1024  clasica=337.023 us  karatsuba=485.939 us  razon=0.69355
+n=2048  clasica=1338.91 us  karatsuba=1644.64 us  razon=0.814107
+n=4096  clasica=5367.36 us  karatsuba=4943.95 us  razon=1.08564
+Punto de cruce (UMBRAL=64): n = 4096 digitos
+checksum (para evitar eliminacion del calculo): 6190806190
+== Midiendo UMBRAL=128  (n_max=4096, muestras=7)
+n=2  clasica=0.0588646 us  karatsuba=0.0648059 us  razon=0.908322
+n=4  clasica=0.0743539 us  karatsuba=0.0827633 us  razon=0.898392
+n=8  clasica=0.153778 us  karatsuba=0.166375 us  razon=0.924289
+n=16  clasica=0.290715 us  karatsuba=0.320634 us  razon=0.906688
+n=32  clasica=0.610582 us  karatsuba=0.706115 us  razon=0.864706
+n=64  clasica=2.03808 us  karatsuba=1.84985 us  razon=1.10175
+n=128  clasica=6.61369 us  karatsuba=7.24837 us  razon=0.912438
+n=256  clasica=23.8162 us  karatsuba=27.9411 us  razon=0.852372
+n=512  clasica=86.4828 us  karatsuba=106.3 us  razon=0.81357
+n=1024  clasica=336.959 us  karatsuba=338.456 us  razon=0.995576
+n=2048  clasica=1339.89 us  karatsuba=1122.14 us  razon=1.19405
+n=4096  clasica=5398.09 us  karatsuba=3409.89 us  razon=1.58307
+Punto de cruce (UMBRAL=128): n = 2048 digitos
+checksum (para evitar eliminacion del calculo): 6210194030
+echo "Listo: CSV en docs/resultados_Darwin_arm64_u*.csv"
+Listo: CSV en docs/resultados_Darwin_arm64_u*.csv
+lalopina@MacBook-Air-de-Jose-3 ADA_P2_Pina_Quimbayo % column -s, -t docs/macos_corrida1/resultados_Darwin_arm64_u64.csv
+n     umbral  reps_clasica  reps_karatsuba  clasica_us_mediana  clasica_us_min  karatsuba_us_mediana  karatsuba_us_min  razon_clasica_sobre_karatsuba
+2     64      2000000       2000000         0.059               0.059           0.065                 0.065             0.906
+4     64      2000000       2000000         0.074               0.074           0.083                 0.083             0.899
+8     64      800000        800000          0.154               0.153           0.166                 0.165             0.927
+16    64      400000        400000          0.294               0.292           0.329                 0.321             0.894
+32    64      200000        200000          0.609               0.609           0.706                 0.705             0.863
+64    64      80000         80000           2.048               2.002           1.847                 1.846             1.109
+128   64      20000         16000           6.615               6.604           11.389                11.379            0.581
+256   64      8000          4000            23.815              23.804          38.234                38.209            0.623
+512   64      2000          800             86.341              86.310          158.635               158.501           0.544
+1024  64      400           400             337.600             336.896         487.181               487.050           0.693
+2048  64      80            80              1341.046            1339.082        1646.738              1645.566          0.814
+4096  64      20            40              5366.808            5363.408        4945.323              4943.284          1.085
+lalopina@MacBook-Air-de-Jose-3 ADA_P2_Pina_Quimbayo % 
+
+
+
+
+
+Last login: Sun Nov  1 13:22:10 on ttys000
+lalopina@MacBook-Air-de-Jose-3 ~ % cd /Users/lalopina/GitHub/ADA_P2/ADA_P2_Pina_Quimbayo
+lalopina@MacBook-Air-de-Jose-3 ADA_P2_Pina_Quimbayo %  python3 -m venv .venv
+source .venv/bin/activate
+pip install matplotlib
+echo ".venv/" >> .gitignore
+python3 scripts/graficar.py docs/macos_corrida1 docs/macos_corrida2 --prefijo docs/macos
+Collecting matplotlib
+  Downloading matplotlib-3.11.2-cp314-cp314-macosx_11_0_arm64.whl.metadata (80 kB)
+Collecting contourpy>=1.0.1 (from matplotlib)
+  Downloading contourpy-1.4.0-cp314-cp314-macosx_11_0_arm64.whl.metadata (3.8 kB)
+Collecting cycler>=0.10 (from matplotlib)
+  Using cached cycler-0.12.1-py3-none-any.whl.metadata (3.8 kB)
+Collecting fonttools>=4.28.2 (from matplotlib)
+  Downloading fonttools-4.68.0-cp314-cp314-macosx_10_15_universal2.whl.metadata (139 kB)
+Collecting kiwisolver>=1.3.1 (from matplotlib)
+  Downloading kiwisolver-1.5.1-cp314-cp314-macosx_11_0_arm64.whl.metadata (5.2 kB)
+Collecting numpy>=1.25 (from matplotlib)
+  Downloading numpy-2.5.4-cp314-cp314-macosx_14_0_arm64.whl.metadata (6.6 kB)
+Collecting packaging>=20.0 (from matplotlib)
+  Using cached packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+Collecting pillow>=9 (from matplotlib)
+  Downloading pillow-13.0.0-cp314-cp314-macosx_11_0_arm64.whl.metadata (9.1 kB)
+Collecting pyparsing>=3 (from matplotlib)
+  Downloading pyparsing-3.3.3-py3-none-any.whl.metadata (5.9 kB)
+Collecting python-dateutil>=2.7 (from matplotlib)
+  Downloading python_dateutil-4.0.0-py3-none-any.whl.metadata (7.3 kB)
+Collecting tzdata (from python-dateutil>=2.7->matplotlib)
+  Downloading tzdata-2026.6-py2.py3-none-any.whl.metadata (1.4 kB)
+Downloading matplotlib-3.11.2-cp314-cp314-macosx_11_0_arm64.whl (9.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.3/9.3 MB 22.8 kB/s  0:04:23
+Downloading contourpy-1.4.0-cp314-cp314-macosx_11_0_arm64.whl (283 kB)
+Using cached cycler-0.12.1-py3-none-any.whl (8.3 kB)
+Downloading fonttools-4.68.0-cp314-cp314-macosx_10_15_universal2.whl (3.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.1/3.1 MB 742.0 kB/s  0:00:05
+Downloading kiwisolver-1.5.1-cp314-cp314-macosx_11_0_arm64.whl (64 kB)
+Downloading numpy-2.5.4-cp314-cp314-macosx_14_0_arm64.whl (5.5 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.5/5.5 MB 87.7 kB/s  0:00:56
+Using cached packaging-26.3-py3-none-any.whl (129 kB)
+Downloading pillow-13.0.0-cp314-cp314-macosx_11_0_arm64.whl (4.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.9/4.9 MB 1.8 MB/s  0:00:02
+Downloading pyparsing-3.3.3-py3-none-any.whl (126 kB)
+Downloading python_dateutil-4.0.0-py3-none-any.whl (92 kB)
+Downloading tzdata-2026.6-py2.py3-none-any.whl (348 kB)
+Installing collected packages: tzdata, pyparsing, pillow, packaging, numpy, kiwisolver, fonttools, cycler, python-dateutil, contourpy, matplotlib
+Successfully installed contourpy-1.4.0 cycler-0.12.1 fonttools-4.68.0 kiwisolver-1.5.1 matplotlib-3.11.2 numpy-2.5.4 packaging-26.3 pillow-13.0.0 pyparsing-3.3.3 python-dateutil-4.0.0 tzdata-2026.6
+
+[notice] A new release of pip is available: 26.1.2 -> 26.2.2
+[notice] To update, run: pip install --upgrade pip
+
+Exponente p ajustado (T ~ n^p), usando n >= 128   [log2(3) = 1.585]
+ UMBRAL  clasica p  karatsuba p  x por duplicar (K)
+      1      1.935        1.607                3.05
+     16      1.935        1.656                3.15
+     64      1.935        1.763                3.39
+    128      1.936        1.782                3.44
+
+Guardado: docs/macos_tiempo.png y docs/macos_razon.png
+(.venv) lalopina@MacBook-Air-de-Jose-3 ADA_P2_Pina_Quimbayo % caffeinate -i make medir UMBRALES="256 512"
+mkdir -p docs/macos_corrida3
+mv docs/resultados_*.csv docs/entorno_*.txt docs/macos_corrida3/
+python3 scripts/graficar.py docs/macos_corrida1 docs/macos_corrida2 docs/macos_corrida3 --prefijo docs/macos
+mkdir -p docs
+{ echo "fecha: $(date)"; echo "sistema: $(uname -a)"; echo "compilador: $(c++ --version | head -1)"; \
+	  echo "banderas: -std=c++17 -O2 -Wall -Wextra -Isrc"; \
+	  if command -v lscpu >/dev/null 2>&1; then lscpu | grep -E "Model name|^CPU\(s\)|max MHz|Thread|Core"; \
+	  else echo "cpu: $(sysctl -n machdep.cpu.brand_string 2>/dev/null)"; fi; } > docs/entorno_Darwin_arm64.txt
+cat docs/entorno_Darwin_arm64.txt
+fecha: Sun  1 Nov 2026 13:52:50 -05
+sistema: Darwin MacBook-Air-de-Jose-3.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:27 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T8103 arm64
+compilador: Apple clang version 21.0.0 (clang-2100.4.1.1)
+banderas: -std=c++17 -O2 -Wall -Wextra -Isrc
+cpu: Apple M1
+mkdir -p build
+c++ -std=c++17 -O2 -Wall -Wextra -Isrc -DUMBRAL=256 src/aritmetica.cpp src/clasica.cpp src/karatsuba.cpp src/medicion.cpp -o build/medicion_u256
+mkdir -p build
+c++ -std=c++17 -O2 -Wall -Wextra -Isrc -DUMBRAL=512 src/aritmetica.cpp src/clasica.cpp src/karatsuba.cpp src/medicion.cpp -o build/medicion_u512
+for u in 256 512; do \
+	  echo "== Midiendo UMBRAL=$u  (n_max=4096, muestras=7)"; \
+	  ./build/medicion_u$u 4096 7 > docs/resultados_Darwin_arm64_u$u.csv || exit 1; \
+	done
+== Midiendo UMBRAL=256  (n_max=4096, muestras=7)
+n=2  clasica=0.0581045 us  karatsuba=0.0638428 us  razon=0.910118
+n=4  clasica=0.072936 us  karatsuba=0.081282 us  razon=0.89732
+n=8  clasica=0.150602 us  karatsuba=0.163194 us  razon=0.922844
+n=16  clasica=0.283244 us  karatsuba=0.315444 us  razon=0.897922
+n=32  clasica=0.597824 us  karatsuba=0.771724 us  razon=0.77466
+n=64  clasica=1.99981 us  karatsuba=1.81926 us  razon=1.09925
+n=128  clasica=6.64345 us  karatsuba=6.57677 us  razon=1.01014
+n=256  clasica=23.738 us  karatsuba=23.6247 us  razon=1.0048
+n=512  clasica=85.6857 us  karatsuba=84.0628 us  razon=1.01931
+n=1024  clasica=330.81 us  karatsuba=274.012 us  razon=1.20728
+n=2048  clasica=1314.22 us  karatsuba=912.807 us  razon=1.43975
+n=4096  clasica=5299.45 us  karatsuba=2796.18 us  razon=1.89525
+Punto de cruce (UMBRAL=256): n = 64 digitos
+checksum (para evitar eliminacion del calculo): 6837790190
+== Midiendo UMBRAL=512  (n_max=4096, muestras=7)
+n=2  clasica=0.0587803 us  karatsuba=0.0648302 us  razon=0.906681
+n=4  clasica=0.0730352 us  karatsuba=0.0829109 us  razon=0.880889
+n=8  clasica=0.150855 us  karatsuba=0.165802 us  razon=0.909852
+n=16  clasica=0.29854 us  karatsuba=0.307492 us  razon=0.970887
+n=32  clasica=0.608945 us  karatsuba=0.693553 us  razon=0.878008
+n=64  clasica=2.05147 us  karatsuba=1.84725 us  razon=1.11055
+n=128  clasica=6.49167 us  karatsuba=6.68937 us  razon=0.970447
+n=256  clasica=23.3719 us  karatsuba=23.639 us  razon=0.988704
+n=512  clasica=85.8984 us  karatsuba=86.7482 us  razon=0.990203
+n=1024  clasica=336.918 us  karatsuba=285.295 us  razon=1.18095
+n=2048  clasica=1332.69 us  karatsuba=876.856 us  razon=1.51985
+n=4096  clasica=5368.65 us  karatsuba=2738.05 us  razon=1.96076
+Punto de cruce (UMBRAL=512): n = 1024 digitos
+checksum (para evitar eliminacion del calculo): 6837790190
+echo "Listo: CSV en docs/resultados_Darwin_arm64_u*.csv"
+Listo: CSV en docs/resultados_Darwin_arm64_u*.csv
+
+Exponente p ajustado (T ~ n^p), usando n >= 128   [log2(3) = 1.585]
+ UMBRAL  clasica p  karatsuba p  x por duplicar (K)
+      1      1.935        1.607                3.05
+     16      1.935        1.656                3.15
+     64      1.935        1.763                3.39
+    128      1.936        1.782                3.44
+    256      1.929        1.748                3.36
+    512      1.941        1.736                3.33
+
+Guardado: docs/macos_tiempo.png y docs/macos_razon.png
+(.venv) lalopina@MacBook-Air-de-Jose-3 ADA_P2_Pina_Quimbayo % python3 scripts/graficar.py docs/macos_corrida1 docs/macos_corrida2 docs/macos_corrida3 --prefijo docs/macos
+
+Exponente p ajustado (T ~ n^p), usando n >= 128   [log2(3) = 1.585]
+ UMBRAL  clasica p  karatsuba p  x por duplicar (K)
+      1      1.935        1.607                3.05
+     16      1.935        1.656                3.15
+     64      1.935        1.763                3.39
+    128      1.936        1.782                3.44
+    256      1.929        1.748                3.36
+    512      1.941        1.736                3.33
+
+Punto de cruce: menor n > UMBRAL con razón > 1 desde ahí hasta el final
+ UMBRAL   cruce n  razón en n  razón en n_max  nota
+      1        --          --           0.018  no aparece en el rango medido
+     16        --          --           0.375  no aparece en el rango medido
+     64      4096       1.085           1.085  
+    128      1024       1.007           1.588  empate (<5%): no es un cruce firme
+    256       512       1.019           1.895  empate (<5%): no es un cruce firme
+    512      1024       1.181           1.961  
+
+Guardado: docs/macos_tiempo.png, docs/macos_razon.png y docs/macos_tabla.tex
+(.venv) lalopina@MacBook-Air-de-Jose-3 ADA_P2_Pina_Quimbayo % 

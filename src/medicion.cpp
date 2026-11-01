@@ -127,9 +127,10 @@ int main(int argc, char **argv)
         razones.push_back(razon);
     }
 
-    // Cruce "persistente": menor n desde el cual Karatsuba gana en todos los tamaños siguientes.
+    // Cruce "persistente": menor n > UMBRAL desde el cual Karatsuba gana en todos los tamaños siguientes.
+    // (Para n <= UMBRAL, Karatsuba ejecuta el mismo caso base cuadrático: esa razón no cuenta.)
     long idx = -1;
-    for (long i = (long)ns.size() - 1; i >= 0 && razones[i] > 1.0; i--)
+    for (long i = (long)ns.size() - 1; i >= 0 && ns[i] > UMBRAL && razones[i] > 1.0; i--)
         idx = i;
     if (idx >= 0)
         std::cerr << "Punto de cruce (UMBRAL=" << UMBRAL << "): n = " << ns[idx] << " digitos\n";

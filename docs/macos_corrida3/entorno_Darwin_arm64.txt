@@ -1,0 +1,5 @@
+fecha: Sun  1 Nov 2026 13:52:50 -05
+sistema: Darwin MacBook-Air-de-Jose-3.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:27 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T8103 arm64
+compilador: Apple clang version 21.0.0 (clang-2100.4.1.1)
+banderas: -std=c++17 -O2 -Wall -Wextra -Isrc
+cpu: Apple M1
